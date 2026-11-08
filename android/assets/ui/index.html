@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'"><title>宿舍快开</title><link rel="stylesheet" href="gongda.css"><link rel="stylesheet" href="door.css"><script src="door.js" defer></script></head>
+<body>
+<svg class="symbols" aria-hidden="true"><defs>
+<symbol id="brand" viewBox="0 0 108 108"><path fill="#245bdb" d="M42 32h21q13 0 13 13v12h-9V45q0-4-4-4H42Z"/><path fill="#20b8ab" d="M32 51h9v12q0 4 4 4h21v9H45q-13 0-13-13Z"/></symbol>
+<symbol id="door" viewBox="0 0 24 24"><path d="M5 20V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v15M3 20h18M14 12v1"/></symbol>
+<symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0M12 14v3"/></symbol>
+<symbol id="bolt" viewBox="0 0 24 24"><path d="m13 2-9 12h7l-1 8 10-13h-7z"/></symbol>
+<symbol id="settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></symbol>
+<symbol id="grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="2"/><rect x="14" y="4" width="6" height="6" rx="2"/><rect x="4" y="14" width="6" height="6" rx="2"/><rect x="14" y="14" width="6" height="6" rx="2"/></symbol>
+<symbol id="arrow" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+<symbol id="bluetooth" viewBox="0 0 24 24"><path d="m6 7 12 10-6 5V2l6 5L6 17"/></symbol>
+<symbol id="signal" viewBox="0 0 24 24"><path d="M4 19v-3M9 19v-7M14 19V8M19 19V4"/></symbol>
+<symbol id="history" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6M12 7v5l3 2"/></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-2 7-2 9h16c0-2-2-2-2-9M10 21h4"/></symbol>
+<symbol id="copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="3"/><path d="M5 16H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+<symbol id="shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6zM8 12l3 3 5-6"/></symbol>
+<symbol id="power" viewBox="0 0 24 24"><path d="M12 2v10M7 5a8 8 0 1 0 10 0"/></symbol>
+</defs></svg>
+<header class="appbar"><span class="app-name"><svg class="brand-mark" aria-hidden="true"><use href="#brand"/></svg>宿舍快开</span><div class="appbar-actions"><span class="account-chip"><span class="dot" id="readyDot"></span><span id="accountText">读取宿舍</span></span><button class="icon-btn" id="theme" aria-label="切换深浅色" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor"/></svg></button></div></header>
+<main class="content">
+<section id="home" class="page">
+ <div class="page-head"><div><h1>开门</h1><p>连接提前准备，到了门旁直接点。</p></div><span class="date-label" id="today"></span></div>
+ <section class="card door-card" id="doorCard" data-status="preparing" aria-label="我的房间">
+  <div class="room-top"><span class="overline">我的房间</span><button class="badge info room-switch" data-action="rooms" id="roomSwitch" aria-label="切换宿舍">切换宿舍 <svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button></div>
+  <p class="account-line" id="activeAccount">正在读取账号</p><div class="room-layout"><div class="room-copy"><h2 id="room">读取宿舍…</h2><p class="room-sub"><svg class="icon" aria-hidden="true"><use href="#bluetooth"/></svg>蓝牙直连 · 靠近使用</p></div><div class="door-art" aria-hidden="true"><svg class="brand-art" aria-hidden="true"><use href="#brand"/></svg></div></div>
+  <button class="btn filled wide unlock" data-action="open" id="unlock" disabled><svg class="icon" aria-hidden="true"><use href="#lock"/></svg><span id="unlockLabel">读取宿舍…</span></button>
+  <button class="btn filled wide" data-action="import" id="firstImport" hidden>导入我的宿舍</button>
+  <p class="room-hint" id="roomHint" role="status">正在准备本人房间…</p>
+  <div class="stage-wrap" id="stageWrap" hidden><div class="stage-dots"><span class="stage-dot"></span><span class="stage-dot"></span><span class="stage-dot"></span><span class="stage-dot"></span><span class="stage-dot"></span><span class="stage-dot"></span></div><div class="stage-meta"><span class="stage-label" id="stageLabel"></span><span class="stage-count" id="stageCount"></span></div><div class="stage-track"><div id="stageBar"></div></div></div>
+  <div class="retry-wrap"><button class="btn text" data-action="retry" id="restorePersonal" hidden>恢复本机预置宿舍</button><button class="btn text" data-action="retry" id="retry" hidden>重新准备房间</button></div>
+ </section>
+ <section class="card connection-card" id="connectionCard" aria-label="连接准备"><div class="connection-head"><span class="connection-dot" id="connectionDot"></span><strong id="connectionTitle">连接准备</strong><button class="btn text" data-action="warm" id="warmButton">提前连接</button></div><p id="connectionHint">到门旁后可提前连接。</p></section>
+ <section class="card onboarding" id="onboarding" hidden><h2>第一次使用</h2><p>先导入你本人的宿舍授权文件，再到门旁测试。当前支持 .dormkey 文件。</p><button class="btn text" data-action="importHelp">查看导入教程 <svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button></section>
+ <div class="section-head" id="quickSection"><h2>顺手的入口</h2><span class="overline">不用每次打开应用</span></div>
+ <div class="quick-grid" id="quickEntries"><button class="card quick" data-action="tile"><span class="quick-icon"><svg class="icon" aria-hidden="true"><use href="#grid"/></svg></span><span><strong>控制中心</strong><small>下拉，点一下开门</small></span></button><button class="card quick" data-action="shortcut"><span class="quick-icon"><svg class="icon" aria-hidden="true"><use href="#bolt"/></svg></span><span><strong>桌面快捷项</strong><small>放在最顺手的位置</small></span></button></div>
+ <div class="monitor-summary" id="monitorSummary" hidden><span id="monitorText">后台检测正在运行</span><button class="btn text" data-action="stop" id="stopMonitor" hidden>停止检测</button></div>
+ <div class="section-head"><h2>最近一次</h2><button class="btn text" data-action="records">全部记录 <svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button></div><section class="card result-card"><span class="result-icon"><svg class="icon" aria-hidden="true"><use href="#history"/></svg></span><div class="result-copy"><span class="overline">本机记录</span><p class="small" id="lastResult">还没有开门记录</p></div></section>
+</section>
+<section id="settingsPage" class="page" hidden>
+ <div class="page-head"><div><h1>设置</h1><p>让开门更顺手。</p></div></div>
+ <section class="card setting-intro"><svg class="app-icon" aria-hidden="true"><use href="#brand"/></svg><div><h2>宿舍快开</h2><p class="muted" id="settingsHint">先选择自己的宿舍，日常开门使用原生蓝牙。</p></div></section>
+ <button class="btn outlined wide guide-button" data-action="importHelp">取得授权文件与导入教程</button>
+ <div class="section-head"><h2>账号与宿舍</h2></div><section class="card list-card">
+ <button class="setting-row" data-action="accounts" id="accountsButton"><span class="row-icon"><svg class="icon" aria-hidden="true"><use href="#shield"/></svg></span><span class="row-copy"><strong>切换账号</strong><small id="accountSummary">管理已保存的账号与宿舍</small></span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+ <button class="setting-row" data-action="rooms" id="roomsButton"><span class="row-icon"><svg class="icon" aria-hidden="true"><use href="#door"/></svg></span><span class="row-copy"><strong>切换宿舍</strong><small id="roomSummary">选择当前账号已保存的宿舍</small></span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+ <button class="setting-row" data-action="import" id="addProfile"><span class="row-icon neutral"><svg class="icon" aria-hidden="true"><use href="#copy"/></svg></span><span class="row-copy"><strong>添加账号或宿舍</strong><small>选择你本人对应的 .dormkey 文件</small></span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+ </section>
+ <div class="section-head"><h2>使用与检测</h2></div><section class="card list-card">
+ <button class="setting-row" data-action="system"><span class="row-icon "><svg class="icon" aria-hidden="true"><use href="#bell"/></svg></span><span class="row-copy"><strong>通知与后台运行</strong><small>检查通知权限与系统后台限制</small></span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+ <button class="setting-row" data-action="observe"><span class="row-icon "><svg class="icon" aria-hidden="true"><use href="#signal"/></svg></span><span class="row-copy"><strong>只观察接近</strong><small>查看触发时机，不自动开门</small></span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+ <button class="setting-row" data-action="records"><span class="row-icon "><svg class="icon" aria-hidden="true"><use href="#history"/></svg></span><span class="row-copy"><strong>运行记录</strong><small>最近 40 条，仅保存在本机</small></span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+ </section>
+ <details class="experiments"><summary>自动接近 · 试验功能</summary><p class="small muted">此前尚无成功的自动开门反馈。先用手动开门验证自己的门锁。</p> <section class="card arrival-card"><div><h2>这次回宿舍</h2><p class="small muted">10 分钟内尝试一次，15 秒后开始检测</p></div><button class="btn filled wide" data-action="arrival" id="arrivalButton">开启回宿舍模式</button><p class="small muted" id="arrivalHint">10 分钟有效 · 无需先检测离开</p></section>
+ <div class="section-head"><h2>靠近与检测</h2><span class="overline">按需开启</span></div>
+ <section class="card auto-card" id="autoCard" data-mode="off"><div class="auto-head"><div><h2>接近开锁 · 试验</h2><p class="small muted">先连续检测离开，再靠近尝试一次</p></div><button class="switch" data-action="auto" id="autoSwitch" role="switch" aria-checked="false" aria-label="靠近自动开锁"><span></span></button></div><div class="auto-state"><span class="dot" id="autoDot"></span><span id="autoStatus">已关闭</span></div><p class="small muted" id="autoDetail">默认关闭，需要时再开启。</p><p class="small muted caveat">蓝牙无法区分门内外，室内移动也可能触发。</p><button class="btn outlined wide" data-action="stop">停止当前检测</button></section>
+</details>
+ <div class="section-head"><h2>连接与排查</h2></div><section class="card list-card">
+ <button class="setting-row" data-action="advanced"><span class="row-icon neutral"><svg class="icon" aria-hidden="true"><use href="#settings"/></svg></span><span class="row-copy"><strong>连接诊断与信号精调</strong><small>查看连接情况，按需调整触发距离</small></span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+ <button class="setting-row" data-action="diagnostics"><span class="row-icon neutral"><svg class="icon" aria-hidden="true"><use href="#copy"/></svg></span><span class="row-copy"><strong>复制诊断信息</strong><small>遇到问题时，复制并反馈</small></span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+ </section>
+ <div class="section-head"><h2>本机授权</h2></div><section class="card list-card">
+ <button class="setting-row" data-action="import"><span class="row-icon neutral"><svg class="icon" aria-hidden="true"><use href="#shield"/></svg></span><span class="row-copy"><strong>更新已保存的授权</strong><small>重新核对并更新同一账号与宿舍</small></span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+ <button class="setting-row" data-action="disable"><span class="row-icon danger"><svg class="icon" aria-hidden="true"><use href="#power"/></svg></span><span class="row-copy"><strong>清除所有本机授权</strong><small>移除全部已保存账号与宿舍，停止检测</small></span><svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button>
+ </section>
+ <button class="btn text about" data-action="help">版本 <span id="version">0.10.0</span> · 使用说明 <svg class="icon" aria-hidden="true"><use href="#arrow"/></svg></button><p class="privacy small muted" id="buildPrivacy">公开测试版 · 导入自己的宿舍后使用</p>
+</section>
+</main>
+<nav class="nav" aria-label="功能导航"><button data-page="home" aria-current="page"><span class="ic"><svg class="icon" aria-hidden="true"><use href="#door"/></svg></span><span>开门</span></button><button data-page="settingsPage"><span class="ic"><svg class="icon" aria-hidden="true"><use href="#settings"/></svg></span><span>设置</span></button></nav>
+<div id="toast" role="status" hidden></div>
+</body></html>

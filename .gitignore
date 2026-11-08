@@ -1,0 +1,14 @@
+build/
+private/
+android/signing/
+*.keystore
+*.dormrequest
+*.dormkey
+observed-session.json
+
+dist/
+*.jks
+*.p12
+*.pem
+.env
+local.properties

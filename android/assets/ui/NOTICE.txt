@@ -1,0 +1,13 @@
+Shared UI CSS copied from user project D:/AI/gongda-source/app/styles.css.
+Includes color tokens, typography, cards, app bar, navigation, buttons and common components.
+Source SHA-256: bf73379e39e7aef622f9e5674b7603bc8a0c154b1de83b2295aeeb7d257ad82a
+No campus account data or school business logic copied.
+
+
+0.6.0 redesign references (read-only):
+- D:/AI/gongda-source/app/styles.css, app/motion.js, branding/README.md
+- D:/AI/项目/dianfei/app/assets/styles.css, app/assets/index.html, icon-preview.png
+Adapts neutral surfaces, rounded cards, line icons, floating pill navigation and reduced-motion support.
+Doorway icon is newly drawn vector geometry, inspired by the shared white/blue/cyan palette;
+no reference app bitmap, account data, API or business logic is included.
+Icon exports: tools/export-icon.py; Android adaptive and monochrome resources.

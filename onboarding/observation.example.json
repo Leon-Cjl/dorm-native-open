@@ -1,0 +1,14 @@
+{
+  "schema": "dorm-native-observation/1",
+  "appId": "wx5ab2a45f1eba1dcf",
+  "source": "official-pc-visible-session",
+  "ownerConsent": false,
+  "capturedAt": "由AI填写当前实际观测的ISO时间",
+  "companyName": "由当前本人官方页面读取的学校全称",
+  "staffID": "由当前本人官方页面读取的学号",
+  "roomNo": "由当前本人官方页面读取的完整房间号",
+  "evidence": [
+    {"path": "official-account.png", "sha256": "由AI计算对应原始文件的SHA256"},
+    {"path": "official-room.png", "sha256": "由AI计算对应原始文件的SHA256"}
+  ]
+}

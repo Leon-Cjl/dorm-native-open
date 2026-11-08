@@ -1,0 +1,132 @@
+"""Create the detailed self-service guide, then render with existing LibreOffice."""
+from pathlib import Path
+import subprocess
+from docx import Document
+from docx.shared import Cm, Pt, RGBColor
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+
+root = Path(__file__).resolve().parents[1]
+out = root / 'dist' / '自助签发详细教程-0.10.0'
+out.mkdir(parents=True, exist_ok=True)
+PAGES = [
+('先回答：到底怎么自己签发？', [
+('最重要的版本区别', '此前发布的0.10.0公共APK固定信任发布者的公钥，别人自己签的文件无法直接导入。只给你一条“生成私钥”的命令，仍然会报签名不匹配。要完全不找发布者，本工具包会在你的电脑同时生成自己的签发密钥、固定对应公钥的自助版APK，以及本人的.dormkey。'),
+('最终路线', '自己登录“公寓智锁” → 把自助工具包交给能操作电脑的AI → AI读取本人页面、查询已有权限 → 在本机自签并构建配套APK → 安装“宿舍快开·自助版” → 选中自己的.dormkey自动绑定。全程不把本人资料交给发布者，不需要发布者逐个签发。'),
+('你最终会得到什么', '① 宿舍快开-自助版.apk：固定了你自己的公钥，使用独立包名，应用名称带“自助版”。\n② 本人宿舍授权.dormkey：同一自助目录签出的本人文件。\n③ 自助工作目录：保留你的源码副本、签发私钥和APK更新密钥，后续自己维护。'),
+('为什么是两个配套文件', 'APK中的公钥必须与.dormkey的签名匹配。不能拿这份自签文件去旧公共版导入，也不能把别人的APK、你的.dormkey混用。脚本会保留验签和现有权限校验，不会把应用改成接受任意签名。'),
+('适用范围', '当前面向Windows电脑＋Android手机；首次需要能读取本机窗口或本人实际截图、并运行命令的AI。仅处理本人已有且已适配的蓝牙房间权限。纯手机一键生成、NFC发卡、门锁管理员设置均不在本流程内。'),
+('给已经装过旧版的人', '不用为此先卸载旧版。自助版有独立包名，可以并存；实际使用时打开名称带“自助版”的应用。测试前停止旧版的后台预连接，并退出官方小程序开锁页面，避免同时抢连同一把锁。'),
+]),
+('普通使用者：照着这六步做', [
+('1　解压完整工具包', '将“宿舍快开-自助签发工具包”完整解压到自己的本地目录。普通使用者先看外层“00-小白照着做.pdf”；“程序模板”文件夹才是源码根目录，内部有build.ps1、android、onboarding、tools和self-service。技术步骤由AI处理，不要只拖出一个脚本运行。'),
+('2　把完整指令交给AI', '将包内“给AI的完整指令.txt”的全文发给你的本机AI，并告诉它工具包实际存放路径，让它实际完成文件生成和构建。只会聊天、无法读取本机文件或执行命令的AI不能完成整条流程，应换用具备这些能力的工具。'),
+('3　检查环境，缺少再处理', 'AI先检查已有Node.js、PowerShell7（pwsh）、JDK和Android SDK。已有Android Studio时优先复用其jbr及SDK。本包无需npm install、Gradle、模拟器、NDK或CMake，也不会自动安装软件。缺环境时，AI先说明安装盘符、空间和常驻/自启影响，由你决定。'),
+('4　自己登录官方小程序', '在电脑微信打开“公寓智锁”，自己登录本人的账号。准备“我的”页面中的学校全称与本人学号，以及“我的房间”中的完整房间号。AI可以在这两页间切换；不要进入他人的开门记录，不要把密码或验证码交给脚本。'),
+('5　让AI完成处理', 'AI读取当前页面、保存对应原始截图或UI证据、计算摘要并生成观测记录。随后脚本只读查询本人已有权限，在全新自助目录生成自己的密钥和配套APK。不需要人工逐项核对、复制摘要确认或联系发布者。'),
+('6　取出两个结果文件', '从生成的自助工作目录/dist中取“宿舍快开-自助版.apk”和“本人宿舍授权.dormkey”，保存到自己的手机。申请中间文件.dormrequest不是最终授权，不能改后缀来导入。生成成功或编译成功，也还不等于实体门已经打开。'),
+('电脑资源说明', '首次开发环境可能达到GB级，远大于本工具包，应按官方系统要求和实际SDK组件预留磁盘。已经具备环境时不需要重复下载安装。签发与构建没有常驻服务器，构建结束后无需保留Java等构建进程在后台运行。'),
+]),
+('交给AI执行的命令与验收点', [
+('A　记录实际本人页面', 'AI依据onboarding/observation.example.json生成本地私有的observed-session.json。填写真实学校全称、本人学号、完整房间号、实际ISO时间、ownerConsent:true，以及1至4份对应PNG/JPG/XML证据文件的路径和SHA-256。不能用示例值、猜测值或他人的资料查询。'),
+('B　生成本人采集中间文件', 'AI进入解压后的“程序模板”文件夹，以该目录为模板根目录执行命令，路径替换成使用者电脑上的实际位置。观测只接受一小时内的记录；过期就重新读取本人当前页面。'),
+('code', 'node onboarding/session-export.cjs `\n  ".\\本人输入\\observed-session.json" `\n  ".\\本人输入\\本人宿舍.dormrequest" --self'),
+('C　在新目录自签并构建', 'WorkDir必须是新的、不存在的目录。脚本只在源码副本中固定你的公钥，使用由本机公钥指纹派生的独立包名。它不会读取发布者私钥，也不会修改公共APK的验签代码。'),
+('code', 'pwsh -NoProfile -File .\\self-service\\build-self.ps1 `\n  -Request ".\\本人输入\\本人宿舍.dormrequest" `\n  -EvidenceDir ".\\本人输入" `\n  -WorkDir ".\\我的自助版"'),
+('D　JDK或SDK未自动找到时', '第二条命令可增加-JdkPath "实际JDK或jbr目录" -SdkPath "实际Android SDK目录"。构建脚本检查环境变量和常见安装位置，选择已有API35以上平台及稳定Build Tools，不再要求复刻发布者电脑的D盘路径。'),
+('E　检查实际输出', '应存在dist/self-delivery.json、配套APK和.dormkey。日志应显示APK编译与签名成功；应用包名以cn.dormnative.self.k开头，名称为“宿舍快开·自助版”。APK中不预置owner.dormkey，私人授权单独导入。不要在聊天中粘贴私钥或授权文件全文。'),
+('失败如何继续', '如果已创建了自助目录但编译失败，保留该目录和密钥。修复缺失环境后，从工具包根目录运行：pwsh -NoProfile -File self-service/build-self.ps1 -WorkDir "原自助目录" -Resume。按需补JDK/SDK路径；它会保留原密钥继续构建并整理结果，不要删除目录重来。'),
+]),
+('手机导入、预连接与第一次开门', [
+('1　安装正确的APK', '安装你自己电脑生成的“宿舍快开-自助版.apk”。安装后确认打开的是名称带“自助版”的应用。旧公共版和你的自助版是两套独立安装，自签文件不能跨这两套应用导入。无需清除旧版数据。'),
+('2　保存并选择自己的文件', '把同一自助目录的“本人宿舍授权.dormkey”保存到手机下载目录。打开自助版，点“导入我的宿舍”，通过系统文件选择器选中它。程序会自动校验签名、当前房间权限并绑定，不再弹出“核对并切换”。保持网络连接，等待完成。'),
+('3　防止多应用同时抢连', '若旧版已有你的宿舍，先从旧版首页或运行通知停止后台预连接；退出官方小程序的开锁页面。首次测试只让当前自助版尝试连接自己的门锁。不要把“退到桌面”当作一定停止旧版服务。'),
+('4　允许必要权限', '保持手机蓝牙与网络开启。按系统提示允许“附近设备”和通知。通知用于前台预连接服务和停止入口。自助版并不会因为你生成了文件而获得新的学校权限，官方本人账号原来必须具备相应房间的开门能力。'),
+('5　等连接就绪，再本人点开门', '打开开门页会主动预连接，失败按短间隔重试，退到后台也会继续尝试；连上后保持供按钮接续。“可以快速开门”表示连接及本次准备已经完成。由你本人点“开门”，AI不要代点。看到门锁响应后立即推门；此前测试门锁由用户反馈约5秒窗口，自己的锁以实际响应为准。'),
+('6　明确什么才算验证成功', '文件签名通过、APK构建成功、手机导入成功和实体门打开是四个不同结果。最后一项必须由你在本人宿舍门旁确认。手动成功后，本次预连接服务会结束；需要时再打开应用或开启预连接。自动接近仍是试验功能，不能用手动成功代替自动模式验证。'),
+]),
+('以后自己维护：换房、换手机、更新', [
+('保留整个自助工作目录', '最好备份整个目录，而不只备份APK。以下文件各有不同用途：'),
+('code', '我的自助版/\n  private/local-migration-signing.pem      # 你自己的授权签发私钥\n  android/signing/local-test.keystore     # 你自己的APK更新密钥\n  self-workspace.json                    # 独立包名与公钥指纹\n  android/src/.../MigrationTrust.java     # 固定你公钥的验签代码\n  dist/宿舍快开-自助版.apk\n  dist/本人宿舍授权.dormkey'),
+('换宿舍：原密钥继续用', '先用自己当前官方页面重新采集新宿舍资料，生成新的.dormrequest。然后在原自助目录执行下方命令，仍使用自己原来的签发私钥，不用找发布者，也不用重建应用。将新生成文件导入同一个自助版即可；只能迁移本人已有权限。'),
+('code', 'node tools/issue-dormkey.cjs "新宿舍.dormrequest" "对应证据目录" "dist/新宿舍授权.dormkey"'),
+('换手机：恢复同一对文件', '在新手机安装你保留的同一自助版APK，再导入自己的.dormkey，并按新手机提示允许必要权限。不要拿旧公共版替换自助版，也不要把另一人的APK与自己的文件混用。'),
+('更新程序：保留两套密钥和包名', '更新APK需要保留原APK更新密钥；继续导入自己签的文件需要保留原迁移签发私钥与固定公钥；覆盖同一安装还需保留包名。现在没有一键跨源码版本升级脚本，可交给本机AI在保留这些配置后合并新版源码、重新构建。不能直接安装发布者的公共APK来更新你的独立自助版。'),
+('密钥丢失怎么办', '不要向发布者索要其私钥。没有备份时，可以重新从自己的官方会话生成新的本地自助目录、密钥及独立APK；这会成为另一独立安装，旧文件不能与新密钥混用。先确认自己仍能通过官方渠道开门，再处理旧版本资料。'),
+]),
+('常见问题、验证范围与参考', [
+('“提示签名不匹配？”', '先确认打开的是你本机生成的“自助版”，文件也来自同一自助目录。最常见的错误是只生成自签文件，却还在使用先前发布的公共APK。不要通过删除验签来绕过错误。'),
+('“需要找发布者签名、要私钥吗？”', '不需要。新版路线在使用者电脑生成自己的密钥和配套APK。发布者只发布干净模板，不再逐个接收资料和签发。原公共APK仍保持固定信任，不会自动接受使用者的新密钥。'),
+('“只有手机，或AI只能聊天怎么办？”', '当前这套自动构建脚本需要Windows电脑与本机执行能力。没有这些条件就不能声称已经完成自助签发；应由使用者自行准备可信的电脑和工具。这里没有纯手机一键构建或托管签名服务。'),
+('“构建工具缺失或脚本不能运行？”', '先让AI检查实际工具路径与PowerShell版本。Windows PowerShell5.1不是本流程使用的PowerShell7。SDK通过官方SDK Manager管理，优先用Android Studio内置jbr。脚本不会自动改整机执行策略；遇到系统策略限制时应解释具体原因并按使用者自己的系统策略处理。'),
+('“导入了，但蓝牙连不上？”', '停止旧应用后台预连接、退出官方开锁页面，确认附近设备权限、蓝牙和网络。到本人门旁观察状态，必要时触摸唤醒门锁。对照官方小程序在同位置的表现，记录本应用原文提示和诊断。不要由此推断已经成功适配所有锁。'),
+('本次实际验证了什么', '2026-11-07在本机，基于本人此前实际观测的官方会话申请重新只读查询权限，生成独立本地密钥和配套自助APK，完成真实编译及APK签名。离线回归验证生成公钥可通过生产Java验签、原公共公钥会拒绝自签文件，且模板源码不被改写。'),
+('哪些还未验证', '本次独立自助APK尚未安装到手机，另一名新用户首次导入和实体门开锁也未验证。此前个人/公共版预连接后的手动开门有成功反馈，但不能直接当作本次独立版本的实门验证。此流程不提供官方远程身份认证、NFC发卡或管理员设置。'),
+('官方环境参考（2026-11-07查阅）', 'Android Studio安装与系统要求：https://developer.android.com/studio/install\nAndroid SDK工具管理：https://developer.android.com/tools/sdkmanager\n使用SDK Manager安装缺失组件时，以官方当前页面为准；本包不捆绑或代替JDK、SDK及其他开发工具。'),
+]),
+]
+
+doc = Document()
+section = doc.sections[0]
+section.page_width, section.page_height = Cm(21), Cm(29.7)
+section.top_margin = section.bottom_margin = Cm(1.65)
+section.left_margin = section.right_margin = Cm(1.75)
+normal = doc.styles['Normal']
+normal.font.name = '微软雅黑'
+normal._element.rPr.rFonts.set(qn('w:eastAsia'), '微软雅黑')
+normal.font.size = Pt(10)
+normal.paragraph_format.line_spacing = 1.12
+normal.paragraph_format.space_after = Pt(5)
+for name, size in [('Title', 21), ('Heading 2', 11)]:
+    style = doc.styles[name]
+    style.font.name = '微软雅黑'
+    style._element.rPr.rFonts.set(qn('w:eastAsia'), '微软雅黑')
+    style.font.size = Pt(size)
+    style.font.color.rgb = RGBColor.from_string('245BDB')
+    style.paragraph_format.space_before = Pt(6)
+    style.paragraph_format.space_after = Pt(3)
+    style.paragraph_format.keep_with_next = True
+code_style = doc.styles.add_style('CommandBlock', 1)
+code_style.font.name = 'Consolas'
+code_style._element.rPr.rFonts.set(qn('w:eastAsia'), '微软雅黑')
+code_style.font.size = Pt(8.5)
+code_style.paragraph_format.space_before = Pt(3)
+code_style.paragraph_format.space_after = Pt(7)
+code_style.paragraph_format.line_spacing = 1.05
+code_style.paragraph_format.keep_together = True
+plain, markdown = [], []
+for i, (title, blocks) in enumerate(PAGES):
+    if i:
+        doc.add_page_break()
+    doc.add_paragraph(title, 'Title')
+    doc.add_paragraph(f'宿舍快开 · 本地自助签发教程  |  {i+1} / {len(PAGES)}', 'Subtitle')
+    plain.append(title)
+    markdown.extend(['# ' + title, ''])
+    for head, body in blocks:
+        if head == 'code':
+            p = doc.add_paragraph(body, 'CommandBlock')
+            shade = OxmlElement('w:shd')
+            shade.set(qn('w:fill'), 'F1F5FC')
+            p._p.get_or_add_pPr().append(shade)
+            plain.append(body)
+            markdown.extend(['```powershell', body, '```', ''])
+        else:
+            doc.add_paragraph(head, 'Heading 2')
+            doc.add_paragraph(body)
+            plain.extend([head, body, ''])
+            markdown.extend(['## ' + head, '', body, ''])
+footer = section.footer.paragraphs[0]
+footer.alignment = 2
+footer.add_run('宿舍快开 · 自助签发  |  ')
+field = OxmlElement('w:fldSimple')
+field.set(qn('w:instr'), 'PAGE')
+footer._p.append(field)
+filename = out / '自助签发与导入详细教程.docx'
+doc.save(filename)
+(out / '自助签发与导入详细教程.txt').write_text('\n'.join(plain), encoding='utf-8')
+(root / 'self-service/详细教程.md').write_text('\n'.join(markdown), encoding='utf-8')
+profile = (root / 'build/lo-self-guide').as_uri()
+subprocess.run([r'C:\Program Files\LibreOffice\program\soffice.exe', '-env:UserInstallation=' + profile,
+                '--headless', '--convert-to', 'pdf', '--outdir', str(out), str(filename)],
+               check=True, capture_output=True, timeout=55)
+print('Created detailed DOCX/PDF/TXT guide and Markdown source')

@@ -1,0 +1,67 @@
+/* Shared Gongda tokens; Dianfei-inspired card hierarchy and floating navigation. */
+:root{--nav-h:76px;--brand-blue:#0066ff;--brand-cyan:#00cbd0}
+.symbols{position:absolute;width:0;height:0;overflow:hidden}body{overflow-x:hidden}.small{font-size:13px}
+.appbar{justify-content:space-between;padding:0 16px;gap:8px}.app-name{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:650;margin-right:auto;white-space:nowrap}.brand-mark{width:29px;height:29px;flex-shrink:0}.appbar-actions{gap:4px}.account-chip{padding:0 10px;font-size:11px;min-height:28px}.icon-btn{width:44px;height:44px}.dot{width:6px;height:6px;background:var(--outline)}.dot.ok{background:var(--ok)}
+.content{max-width:560px;padding:4px 20px calc(110px + var(--safe-b))}.page-head{margin:16px 2px 22px;align-items:center;gap:8px}.page-head h1{font-size:32px;letter-spacing:-.8px}.page-head p{display:block;margin-top:4px;font-size:13px;color:var(--muted)}.date-label{font-size:12px;color:var(--muted);align-self:flex-start;padding-top:7px;white-space:nowrap}
+.card{border-radius:24px;margin-bottom:14px}.door-card{padding:22px;position:relative;overflow:hidden}.room-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.room-top .overline{letter-spacing:1px}.badge{font-size:11px;padding:4px 10px;border-radius:12px;font-weight:500}
+.room-layout{display:flex;align-items:center;gap:12px;padding:24px 0 20px;min-height:140px}.room-copy{flex:1;min-width:0}.room-copy h2{font-size:28px;line-height:1.25;letter-spacing:-.6px;overflow-wrap:anywhere}.room-sub{display:flex;align-items:center;gap:5px;margin-top:10px;color:var(--muted);font-size:12px}.room-sub .icon{width:14px;height:14px}
+.door-art{width:90px;height:108px;flex:0 0 90px;border-radius:26px;background:var(--primary-soft);display:grid;place-items:center;transform:rotate(5deg)}.door-art svg{width:82px;height:82px;transform:rotate(-5deg)}
+.unlock.btn{min-height:60px;margin:0;border-radius:19px;font-size:18px;gap:10px;letter-spacing:.5px}.unlock .icon{width:22px;height:22px}.unlock.btn:disabled{opacity:1;background:var(--surface-2);color:var(--muted)}
+.room-hint{font-size:12px;line-height:1.65;color:var(--muted);margin:13px 0 0;min-height:20px;text-align:center;overflow-wrap:anywhere}.door-card[data-status=error] .room-hint{color:var(--err);background:var(--err-soft);padding:10px 12px;border-radius:12px;text-align:left}.door-card[data-status=preparing] .door-art{animation:breathe 1.5s ease-in-out infinite}.retry-wrap{text-align:center}.retry-wrap .btn{margin-top:6px;min-height:44px}
+.section-head{margin:22px 3px 9px;min-height:28px}.section-head h2{font-size:13px;letter-spacing:.3px}.section-head .btn{min-height:40px;font-size:12px;padding-right:0}
+.quick-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:8px}.quick{border:0;display:flex;align-items:flex-start;flex-direction:column;text-align:left;padding:16px;margin:0;gap:12px;min-width:0}.quick-icon,.row-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:var(--primary-soft);color:var(--on-primary-soft);flex-shrink:0}.quick:nth-child(2) .quick-icon{background:var(--surface-2);color:var(--text)}.quick strong{display:block;font-size:14px;font-weight:600}.quick small{display:block;color:var(--muted);font-size:11px;margin-top:3px;line-height:1.5}
+.auto-card{padding:19px 20px}.auto-head{display:flex;align-items:center;justify-content:space-between;gap:14px}.auto-head h2{font-size:16px;margin-bottom:4px}.switch{flex:0 0 54px;width:54px;min-height:44px;border:0;background:transparent;padding:7px 0;position:relative}.switch:before{content:"";position:absolute;inset:7px 0;background:var(--surface-3);border-radius:18px;transition:background .22s}.switch span{position:relative;display:block;width:24px;height:24px;margin:3px;border-radius:50%;background:white;box-shadow:0 1px 3px #0002;transition:transform .25s var(--spring)}.switch[aria-checked=true]:before{background:var(--primary)}.switch[aria-checked=true] span{transform:translateX(24px)}.switch:disabled{opacity:.45}
+.auto-state{display:flex;align-items:center;gap:8px;font-size:12px;margin:18px 0 0;padding:10px 12px;background:var(--surface-2);border-radius:12px;line-height:1.6}.auto-card[data-mode=auto] .auto-state{background:var(--ok-soft);color:var(--ok)}.auto-card[data-mode=observe] .auto-state{background:var(--primary-soft);color:var(--on-primary-soft)}#autoDetail{margin-top:9px;line-height:1.65;font-size:12px}.caveat{font-size:11px;line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}#stopMonitor{margin-top:14px;font-size:13px;min-height:44px;border-radius:14px}
+.result-card{display:flex;gap:12px;align-items:center;padding:17px}.result-icon{width:38px;height:38px;border-radius:13px;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;flex-shrink:0}.result-copy{min-width:0}.result-copy .overline{font-weight:400;font-size:11px}.result-copy p{margin-top:3px;line-height:1.65;white-space:pre-line}
+.setting-intro{display:flex;gap:16px;align-items:center;padding:22px}.setting-intro .app-icon{width:62px;height:62px;border-radius:18px;background:#fff;border:1px solid var(--line);padding:5px;flex-shrink:0}.setting-intro h2{font-size:19px;letter-spacing:-.4px}.setting-intro p{font-size:12px;line-height:1.6;margin-top:4px}
+.list-card{padding:0;overflow:hidden}.setting-row{width:100%;display:flex;align-items:center;gap:13px;text-align:left;background:none;border:0;padding:15px 17px;min-height:80px;position:relative}.setting-row+.setting-row:before{content:"";position:absolute;top:0;left:66px;right:18px;height:1px;background:var(--line)}.row-icon{width:34px;height:34px;border-radius:11px}.row-icon.neutral{background:var(--surface-2);color:var(--muted)}.row-icon.danger{background:var(--err-soft);color:var(--err)}.row-copy{flex:1;min-width:0}.setting-row strong{display:block;font-size:14px;font-weight:550}.setting-row small{display:block;color:var(--muted);font-size:11px;line-height:1.6;margin-top:3px}.setting-row>.icon{color:var(--muted);width:15px;height:15px}.setting-row:active{background:var(--surface-2)}
+.about{display:flex;margin:24px auto 6px;gap:5px;font-size:12px;min-height:44px}.privacy{text-align:center;font-size:11px;line-height:1.8;padding:0 8px}
+/* iOS-style floating tab bar with drag */
+.nav{position:fixed;left:0;right:0;bottom:calc(12px + var(--safe-b));margin:0 auto;padding:7px;min-height:62px;border:1px solid var(--line);border-radius:24px;background:var(--surface);box-shadow:0 8px 32px rgb(0 0 0 / .1),0 2px 8px rgb(0 0 0 / .06);gap:5px;cursor:grab;user-select:none;-webkit-user-select:none;transition:box-shadow .3s;width:fit-content;max-width:calc(100vw - 32px)}
+.nav.dragging{cursor:grabbing;box-shadow:0 16px 48px rgb(0 0 0 / .18),0 4px 12px rgb(0 0 0 / .08)}
+.nav button{flex-direction:row;justify-content:center;align-items:center;min-height:48px;gap:7px;padding:8px 14px;border-radius:18px;font-size:13px;transition:background .22s,color .22s,transform .18s var(--spring)}
+.nav .ic{width:22px;height:26px;background:none;display:grid;place-items:center}
+.nav .icon{width:20px;height:20px}
+.nav button[aria-current=page]{background:var(--primary-soft);color:var(--on-primary-soft)}
+.nav button[aria-current=page] .icon{stroke-width:2.2}
+.btn:not(:disabled):active,.quick:active,.nav button:active{transform:scale(.97)}button{touch-action:manipulation}button:focus-visible{outline-offset:3px}
+#toast{position:fixed;bottom:calc(96px + var(--safe-b));left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 40px);padding:12px 20px;border-radius:16px;background:var(--text);color:var(--bg);font-size:13px;z-index:100;text-align:center}
+.page{animation:appear .26s var(--ease-out)}@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@keyframes breathe{50%{opacity:.45}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media(max-width:350px){.content{padding-left:14px;padding-right:14px}.appbar{padding-left:14px;padding-right:8px}.app-name{font-size:14px;gap:6px}.account-chip{padding:0 7px}.door-card{padding:18px}.room-copy h2{font-size:24px}.door-art{width:72px;height:88px;flex-basis:72px}.door-art svg{width:68px;height:68px}.quick-grid{gap:10px}.quick{padding:14px}.setting-row{padding:14px;gap:10px}}
+@media(min-width:720px){.appbar{padding-left:max(20px,calc((100% - 520px)/2));padding-right:max(20px,calc((100% - 520px)/2))}}
+
+
+.room-switch{border:0;min-height:40px;cursor:pointer}.room-switch .icon{width:13px;height:13px}.room-switch:disabled{opacity:.5}.account-line{font-size:11px;color:var(--muted);margin-top:3px}.room-layout{padding-top:16px}.setting-row:disabled{opacity:.5}
+
+.arrival-card{margin-top:20px;padding:20px}.arrival-card h2{font-size:17px;margin-bottom:5px}.arrival-card .btn{margin:17px 0 10px;border-radius:16px}.arrival-card #arrivalHint{font-size:11px;text-align:center}.auto-card[data-mode=arrival] .auto-state{background:var(--primary-soft);color:var(--on-primary-soft)}
+
+
+/* 0.9.3 workbench polish: stronger focus, clearer interaction, and calmer motion. */
+:where(button,[role="button"],[role="switch"]):focus-visible{
+  outline:3px solid var(--brand-cyan);
+  outline-offset:3px;
+  box-shadow:0 0 0 5px color-mix(in srgb,var(--brand-cyan) 16%,transparent);
+}
+@media (hover:hover) and (pointer:fine){
+  .quick:hover,.setting-row:hover{background:var(--surface-2)}
+  .btn:not(:disabled):hover,.icon-btn:hover,.room-switch:hover{filter:brightness(1.035)}
+}
+.unlock.btn:not(:disabled){box-shadow:0 8px 22px color-mix(in srgb,var(--primary) 18%,transparent)}
+.unlock.btn:not(:disabled):active{transform:translateY(1px) scale(.985);box-shadow:0 3px 10px color-mix(in srgb,var(--primary) 14%,transparent)}
+@media(prefers-reduced-motion:reduce){.quick,.setting-row,.btn,.icon-btn,.room-switch,.unlock.btn{transition:none!important}}
+
+
+/* Stable navigation and a compact manual-opening home. */
+.nav{left:50%;right:auto;top:auto;bottom:calc(12px + var(--safe-b));transform:translateX(-50%);margin:0;cursor:default;z-index:30;max-width:calc(100vw - 32px)}
+.nav button{min-width:108px}.page{animation:none}.door-card,.section-head,.quick,.result-card,.room-copy h2{animation:none!important}
+.room-layout{min-height:108px;padding:20px 0 18px}.room-copy h2{font-size:27px}.door-art{width:72px;height:78px;flex-basis:72px;transform:none;background:var(--surface-2)}.door-art svg{width:68px;height:68px;transform:none}
+.door-card[data-status=ready] .door-art,.door-card[data-status=preparing] .door-art,.door-card[data-status=ready] .unlock.btn{animation:none!important}
+.room-hint{text-align:left;min-height:38px;line-height:1.6}.unlock.btn{min-height:62px}.stage-wrap[hidden]{display:none!important}
+.connection-card{padding:14px 17px}.connection-head{display:flex;align-items:center;gap:9px}.connection-head strong{font-size:13px;flex:1}.connection-head .btn{font-size:12px;min-height:40px;padding:0 3px}.connection-card p{font-size:12px;line-height:1.65;color:var(--muted);margin-top:2px}
+.connection-dot{width:7px;height:7px;border-radius:50%;background:var(--outline)}.connection-dot[data-state=ready]{background:var(--ok)}.connection-dot[data-state=connecting]{background:var(--primary);animation:breathe 1.4s ease-in-out infinite}.connection-dot[data-state=failed]{background:var(--err)}
+.onboarding{padding:18px}.onboarding h2{font-size:16px}.onboarding p{font-size:13px;line-height:1.7;color:var(--muted);margin:9px 0}.onboarding .btn{padding-left:0}.guide-button{margin:10px 0 18px;border-radius:16px}
+.monitor-summary{display:flex;gap:10px;align-items:center;padding:4px 0;font-size:12px;color:var(--muted)}.monitor-summary[hidden]{display:none}.monitor-summary span{flex:1}
+.experiments{margin:20px 0;border:1px solid var(--line);border-radius:20px;padding:16px}.experiments summary{cursor:pointer;font-size:14px;font-weight:600;min-height:32px}.experiments>p{margin:8px 0}.experiments .arrival-card{margin-top:14px;padding:15px}.experiments .auto-card{padding:15px}.experiments .section-head{margin-top:16px}
+#firstImport{border-radius:18px;min-height:60px}.quick{min-height:100px;gap:9px}.quick-icon{width:30px;height:30px;border-radius:10px}.quick-grid .icon{width:18px;height:18px}
+@media(max-width:360px){.room-copy h2{font-size:23px}.door-art{width:56px;height:66px;flex-basis:56px}.door-art svg{width:54px;height:54px}.app-name{font-size:14px}.account-chip{max-width:104px}.nav button{min-width:96px}}
