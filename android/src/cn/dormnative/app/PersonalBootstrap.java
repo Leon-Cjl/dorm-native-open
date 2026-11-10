@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import org.json.JSONObject;
 
-/** Only personal builds contain the signed seed. It is recoverable from the APK, not a secret vault. */
+/** Validates and restores a locally available signed authorization. */
 final class PersonalBootstrap {
     static boolean available(Context c){try(InputStream in=c.getAssets().open("owner.dormkey")){return true;}catch(Exception e){return false;}}
     static boolean install(Context c) throws Exception {

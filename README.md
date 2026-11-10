@@ -2,7 +2,7 @@
 
 # 🔑 宿舍快开
 
-<img src="docs/readme-banner-20261110.png" alt="宿舍快开宣传图：蓝牙与宿舍门锁" width="100%" />
+<img src="docs/preview-20261110.png" alt="宿舍快开宣传图：开门与设置的应用界面" width="100%" />
 
 **本人授权门锁的安卓蓝牙辅助工具**
 
@@ -103,7 +103,6 @@
 
 ```powershell
 .\build.ps1 -Public    # 公众 APK，不预置任何人的授权
-.\build.ps1 -Personal  # 个人 APK，含本人资料，不能公开
 ```
 
 ## 测试

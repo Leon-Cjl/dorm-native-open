@@ -266,7 +266,7 @@ public final class MainActivity extends Activity {
         finally{OperationGuard.release(lease);refreshProfileSummary();syncShortcut();publish();}
     }
     private void clearProfiles(){
-        new AlertDialog.Builder(this).setTitle("清除所有本机授权？").setMessage("将停止检测并移除全部已保存账号和宿舍。个人 APK 内的预置资料仍存在，主动点恢复可重新启用原房间。")
+        new AlertDialog.Builder(this).setTitle("清除所有本机授权？").setMessage("将停止检测并移除全部已保存账号和宿舍。清除后如需使用，请重新导入本人授权。")
             .setNegativeButton("取消",null).setPositiveButton("清除",(d,w)->{
                 if(importing||preparing)return;pending="";ConnectionService.stop(this,false);WarmDoor.close();AutoService.stop(this);Object lease=OperationGuard.acquire();
                 if(lease==null){toast("门锁操作尚未结束，请稍后清除");return;}
@@ -311,7 +311,7 @@ public final class MainActivity extends Activity {
         .setMessage("① 自己登录电脑微信“公寓智锁”。\n② 把发布包中的“AI首次授权导出工具包”交给能操作电脑的 AI。它读取本人账号与宿舍资料，生成待签发文件；维护者的工具会自动签出 .dormkey。\n③ 收到自己的 .dormkey 后，点“选择授权文件”，选中即自动绑定，无需再确认。\n\n已拿到文件可直接从第③步开始。待签发 .dormrequest 不能导入。首次绑定需要维护者返回签名文件，尚非完全自助登录；日常开门不用微信。")
         .setNegativeButton("关闭",null).setPositiveButton("选择授权文件",(d,w)->importFile()).show();}
     private void help(){new AlertDialog.Builder(this).setTitle("宿舍快开 "+AppInfo.version(this))
-        .setMessage((personal?"个人测试版已预置本人资料，请勿转发。\n\n":"公开测试版不包含预置宿舍。先导入属于你本人的 .dormkey 文件；尚未接入微信一键登录。\n\n")+"手动开门：在本人门锁旁保持蓝牙和网络开启，点“开门”。\n\n自动预连接：允许附近设备和通知后，打开开门页会主动尝试，退到后台也会继续。连上后保持供按钮接续，开门成功后结束本次预连接。可在首页或运行通知中停止。系统结束进程后需重新打开应用。\n\n接近自动开门仍是试验功能，在设置中。蓝牙无法分辨门内外，请先验证手动开门。\n\nNFC 发卡和门锁硬件设置尚未接入。预连接只建立通信，不会自动发开锁命令；实际开锁须有本次有效授权。")
+        .setMessage((personal?"请确认已获得本人门锁的有效授权。\n\n":"公开测试版不包含预置宿舍。先导入属于你本人的 .dormkey 文件；尚未接入微信一键登录。\n\n")+"手动开门：在本人门锁旁保持蓝牙和网络开启，点“开门”。\n\n自动预连接：允许附近设备和通知后，打开开门页会主动尝试，退到后台也会继续。连上后保持供按钮接续，开门成功后结束本次预连接。可在首页或运行通知中停止。系统结束进程后需重新打开应用。\n\n接近自动开门仍是试验功能，在设置中。蓝牙无法分辨门内外，请先验证手动开门。\n\nNFC 发卡和门锁硬件设置尚未接入。预连接只建立通信，不会自动发开锁命令；实际开锁须有本次有效授权。")
         .setNegativeButton("关闭",null).setPositiveButton("导入教程",(d,w)->importHelp()).show();}
     private void toast(String s){Toast.makeText(this,s,Toast.LENGTH_LONG).show();}
 }

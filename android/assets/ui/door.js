@@ -48,7 +48,7 @@ window.updateState=function(s){
  $('unlock').hidden=!s.ready&&!busy;
  $('firstImport').hidden=!!s.ready||busy;
  $('onboarding').hidden=!!s.ready||busy;
- $('buildPrivacy').textContent=s.personal?'个人测试版含预置授权，请勿转发；发布请使用公开版。':'公开测试版不含预置宿舍。需要本人的有效授权文件。';
+ $('buildPrivacy').textContent='需要本人的有效授权文件，请勿共享授权资料。';
  let connection='idle',title='尚未预连接',hint='打开应用自动尝试，后台继续重连；也可以直接点开门。';
  if(!s.ready){connection='empty';title='先添加自己的宿舍';hint='完成导入后，应用会在开门页提前准备连接。';}
  else if(s.auto||s.arrival||s.observing){connection='monitor';title='后台检测正在运行';hint='手动开门会先结束空闲检测；自动操作进行中时请等待结果。';}

@@ -1,5 +1,4 @@
-param([switch]$TestsOnly,[switch]$Personal,[switch]$Public)
-if ($Personal -and $Public) { throw "Choose Personal or Public, not both" }
+﻿param([switch]$TestsOnly,[switch]$Public)
 $ErrorActionPreference = 'Stop'
 $taskRoot = $PSScriptRoot
 $taskJdk = 'D:\APPs\Android Studio\jbr'
@@ -52,9 +51,6 @@ try {
         $taskEntry = 'assets/' + [System.IO.Path]::GetRelativePath($taskAssets,$taskAsset.FullName).Replace('\','/')
         [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($taskArchive,$taskAsset.FullName,$taskEntry) | Out-Null
     }
-    if ($Personal) {
-        [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($taskArchive,"$taskRoot\private\本人宿舍授权.dormkey",'assets/owner.dormkey') | Out-Null
-    }
 } finally { $taskArchive.Dispose() }
 & "$taskTools\zipalign.exe" -f -p 4 "$taskBuild\unsigned.apk" "$taskBuild\aligned.apk"
 if ($LASTEXITCODE -ne 0) { throw 'APK alignment failed' }
@@ -65,7 +61,7 @@ if (-not (Test-Path -LiteralPath $taskKey)) {
     & "$taskJdk\bin\keytool.exe" -genkeypair -keystore $taskKey -storepass android -keypass android -alias dormquick -keyalg RSA -keysize 3072 -validity 10000 -dname 'CN=Dorm Quick Open Local Test,O=Local Development,C=CN' -noprompt
     if ($LASTEXITCODE -ne 0) { throw 'Local test signing key generation failed' }
 }
-$taskFlavor = if ($Personal) { 'personal' } elseif ($Public) { 'public' } else { 'test' }
+$taskFlavor = if ($Public) { 'public' } else { 'test' }
 $taskApk = Join-Path $taskDist "dorm-native-open-$taskVersion-$taskFlavor.apk"
 & "$taskJdk\bin\java.exe" -jar "$taskTools\lib\apksigner.jar" sign --ks $taskKey --ks-key-alias dormquick --ks-pass pass:android --key-pass pass:android --out $taskApk "$taskBuild\aligned.apk"
 if ($LASTEXITCODE -ne 0) { throw 'APK signing failed' }
@@ -78,7 +74,7 @@ $taskBadgingExit = $LASTEXITCODE
 $taskBadging | Set-Content -LiteralPath "$taskDist\apk-badging.txt" -Encoding UTF8
 if ($taskBadgingExit -ne 0) { throw 'APK metadata check failed' }
 $taskItem = Get-Item -LiteralPath $taskApk
-$taskBuildResult = [pscustomobject]@{apk=$taskItem.FullName;buildDirectory=$taskBuild;version=$taskVersion;personalBuild=[bool]$Personal;publicBuild=[bool]$Public;bytes=$taskItem.Length;sha256=(Get-FileHash -LiteralPath $taskApk -Algorithm SHA256).Hash;signatureVerified=$true;deviceRuntime='NOT RUN';realDoorUnlock='NOT RUN'} | ConvertTo-Json
+$taskBuildResult = [pscustomobject]@{apk=$taskItem.FullName;buildDirectory=$taskBuild;version=$taskVersion;personalBuild=$false;publicBuild=[bool]$Public;bytes=$taskItem.Length;sha256=(Get-FileHash -LiteralPath $taskApk -Algorithm SHA256).Hash;signatureVerified=$true;deviceRuntime='NOT RUN';realDoorUnlock='NOT RUN'} | ConvertTo-Json
 $taskBuildResult | Set-Content -LiteralPath "$taskDist\build-result.json" -Encoding UTF8
 $taskBuildResult | Set-Content -LiteralPath "$taskDist\build-result-$taskFlavor.json" -Encoding UTF8
 Get-Content -LiteralPath "$taskDist\build-result.json" -Raw
