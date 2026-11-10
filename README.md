@@ -2,6 +2,8 @@
 
 # 🔑 宿舍快开
 
+<img src="docs/readme-banner-20261110.png" alt="宿舍快开宣传图：蓝牙与宿舍门锁" width="100%" />
+
 **本人授权门锁的安卓蓝牙辅助工具**
 
 <img src="https://img.shields.io/badge/版本-0.10.0-blue?style=flat-square" />
